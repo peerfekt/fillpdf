@@ -138,7 +138,18 @@ func createFdfFile(form Form, path string) error {
 
 	// Write the form data.
 	for key, value := range form {
-		fmt.Fprintf(w, "<< /T (%s) /V (%v)>>\n", key, value)
+		var valStr string
+		switch v := value.(type) {
+		case bool:
+			if v {
+				valStr = "Yes"
+			} else {
+				valStr = "Off"
+			}
+		default:
+			valStr = fmt.Sprintf("%v", value)
+		}
+		fmt.Fprintf(w, "<< /T (%s) /V (%s)>>\n", key, valStr)
 	}
 
 	// Write the fdf footer.
