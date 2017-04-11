@@ -24,8 +24,27 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
+
+func getAbs(path string) (string, error) {
+	// Get the absolute paths.
+	absPath, err := filepath.Abs(path)
+	if err != nil {
+		return "", fmt.Errorf("failed to get the absolute path: %v", err)
+	}
+
+	// Check if the form file exists.
+	e, err := exists(path)
+	if err != nil {
+		return "", fmt.Errorf("failed to check if file exists: %v", err)
+	} else if !e {
+		return "", fmt.Errorf("file does not exists: '%s'", path)
+	}
+
+	return absPath, nil
+}
 
 // exists returns whether the given file or directory exists or not
 func exists(path string) (bool, error) {

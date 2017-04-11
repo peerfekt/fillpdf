@@ -1,7 +1,8 @@
 # FillPDF
 
 FillPDF is a golang library to easily fill PDF forms. This library uses the pdftk utility to fill the PDF forms with fdf data.
-Currently this library only supports PDF text field values. Feel free to add support to more form types.
+Currently this library only supports PDF text and checkbox field values. Feel free to add support to more form types (Send pull request to original developer)
+This fork extends with some more pdftk commands - only for the needs I have. 
 
 
 ## Documentation 
