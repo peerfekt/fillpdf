@@ -59,9 +59,9 @@ func Fill(form Form, formPDFFile, destPDFFile string, overwrite bool) error {
 	}
 
 	// Remove the temporary directory on defer again.
-	// defer func() {
-	// 	os.RemoveAll(tmpDir)
-	// }()
+	defer func() {
+		os.RemoveAll(tmpDir)
+	}()
 
 	// Create the temporary output file path.
 	outputFile := filepath.Clean(tmpDir + "/output.pdf")
