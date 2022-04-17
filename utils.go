@@ -103,3 +103,20 @@ func runCommandInPath(dir, name string, args ...string) error {
 
 	return nil
 }
+
+func runCommandWithOutput(dir, name string, args ...string) ([]byte, error) {
+	// Create the command.
+	var stderr bytes.Buffer
+	var stdout bytes.Buffer
+	cmd := exec.Command(name, args...)
+	cmd.Stderr = &stderr
+	cmd.Stdout = &stdout
+	cmd.Dir = dir
+	// Start the command and wait for it to exit.
+	err := cmd.Run()
+	if err != nil {
+		return nil, fmt.Errorf(strings.TrimSpace(stderr.String()))
+	}
+
+	return stdout.Bytes(), nil
+}

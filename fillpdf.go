@@ -115,6 +115,53 @@ func Fill(form Form, formPDFFile, destPDFFile, checkedString, uncheckedString st
 	return nil
 }
 
+func FillPDFToBytes(form Form, formPDFFile, checkedString, uncheckedString string) ([]byte, error) {
+	var err error
+
+	// Check if the pdftk utility exists.
+	if _, err := exec.LookPath("pdftk"); err != nil {
+		return nil, err
+	}
+
+	// Get the absolute paths.
+	if formPDFFile, err = getAbs(formPDFFile); err != nil {
+		return nil, err
+	}
+	// Create a temporary directory.
+	tmpDir, err := ioutil.TempDir("", "fillpdf-")
+	if err != nil {
+		return nil, err
+	}
+
+	// Remove the temporary directory on defer again.
+	defer func() {
+		os.RemoveAll(tmpDir)
+	}()
+	// Create the temporary output file path.
+	//outputFile := filepath.Clean(tmpDir + "/output.pdf")
+
+	// Create the fdf data file.
+	fdfFile := filepath.Clean(tmpDir + "/data.fdf")
+	if err := createFdfFile(form, fdfFile, checkedString, uncheckedString); err != nil {
+		return nil, err
+	}
+
+	// Create the pdftk command line arguments.
+	args := []string{
+		formPDFFile,
+		"fill_form", fdfFile,
+		"output", "-",
+		"flatten",
+	}
+
+	// Run the pdftk utility.
+	bytes, err := runCommandWithOutput(tmpDir, "pdftk", args...)
+	if err != nil {
+		return nil, fmt.Errorf("pdftk error: %v", err)
+	}
+	return bytes, err
+}
+
 // createFdfFile with 16 bit encoded utf to enable creation of pdf with special characters
 func createFdfFile(form Form, path, checkedString, uncheckedString string) error {
 	// Create the file.
