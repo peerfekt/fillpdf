@@ -29,6 +29,10 @@ import (
 	"unicode/utf16"
 )
 
+type FormJson struct {
+	Form Form `json:"form"`
+}
+
 // Form represents the PDF form.
 // This is a key value map.
 type Form map[string]interface{}
