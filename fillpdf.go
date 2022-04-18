@@ -115,40 +115,26 @@ func Fill(form Form, formPDFFile, destPDFFile, checkedString, uncheckedString st
 	return nil
 }
 
-func FillPDFToBytes(form Form, formPDFFile, checkedString, uncheckedString string) ([]byte, error) {
+func FillPDFToBytes(form Form, formAbsolutePath, tmpDir, checkedString, uncheckedString string) ([]byte, error) {
 	var err error
-
-	// Check if the pdftk utility exists.
-	if _, err := exec.LookPath("pdftk"); err != nil {
-		return nil, err
-	}
-
-	// Get the absolute paths.
-	if formPDFFile, err = getAbs(formPDFFile); err != nil {
-		return nil, err
-	}
-	// Create a temporary directory.
-	tmpDir, err := ioutil.TempDir("", "fillpdf-")
+	id, err := GetID("pdf_")
 	if err != nil {
 		return nil, err
 	}
 
-	// Remove the temporary directory on defer again.
-	defer func() {
-		os.RemoveAll(tmpDir)
-	}()
-	// Create the temporary output file path.
-	//outputFile := filepath.Clean(tmpDir + "/output.pdf")
-
 	// Create the fdf data file.
-	fdfFile := filepath.Clean(tmpDir + "/data.fdf")
+	fdfFile := filepath.Clean(tmpDir + "/" + id + ".fdf")
+	defer func() {
+		os.Remove(fdfFile)
+	}()
+
 	if err := createFdfFile(form, fdfFile, checkedString, uncheckedString); err != nil {
 		return nil, err
 	}
 
 	// Create the pdftk command line arguments.
 	args := []string{
-		formPDFFile,
+		formAbsolutePath,
 		"fill_form", fdfFile,
 		"output", "-",
 		"flatten",

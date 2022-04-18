@@ -20,6 +20,7 @@ package fillpdf
 
 import (
 	"bytes"
+	"crypto/rand"
 	"fmt"
 	"io"
 	"os"
@@ -119,4 +120,14 @@ func runCommandWithOutput(dir, name string, args ...string) ([]byte, error) {
 	}
 
 	return stdout.Bytes(), nil
+}
+
+//create Random ID
+func GetID(prefix string) (string, error) {
+	b := make([]byte, 8)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s_%x", prefix, b), nil
 }
